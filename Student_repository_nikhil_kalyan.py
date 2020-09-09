@@ -1,12 +1,10 @@
-"""
-Created on Friday April 06 16:53:34 2020
+
 
 @author: nkalyan🤠
         Implementing student repository database by using python methods and modules. 
 """
 
 
-import os
 from collections import defaultdict
 from prettytable import PrettyTable
 from typing import Dict, Set, List, Iterator, Tuple, DefaultDict
@@ -16,7 +14,7 @@ from HW08_nikhil_kalyan import file_reader
 class Student:
     """ Student class conatians all the info related to students Add course, get GPA etcc.,, """
     header = ["CWID", "Name", "Major", "Completed Courses", "Remaining Required", "Remaining Electives",
-                          "GPA"]
+
 
     def __init__(self, cwid, name, major):
         """ A constructor Initialize student table details """
@@ -43,7 +41,7 @@ class Student:
     def ptable_row(self):
         """ Returning a student prettytable to prettytable method"""
         major, passed_courses, rem_required, rem_electives = self._major.courses_left(self._courses)
-        return [self._cwid, self._name, major, sorted(passed_courses), sorted(rem_required), sorted(rem_electives), self.gpa()]
+
 
 
 class Instructor:
@@ -69,7 +67,7 @@ class Instructor:
 
 class Major:
     """ Major Class consist the info about the number of majors and electives courses"""
-    
+
     names = ['Major', 'Required Courses', 'Electives']
     grades_given = {'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C'}
 
@@ -145,28 +143,22 @@ class University:
     def _get_students_details(self, path):
         """ This method reads the students file and reads the file by line by line ands stores info in Gen """
         try:
-            student_file: Iterator[Tuple[str]] = file_reader(path, 3, sep=';', header=True)
+
             for cwid, name, major in student_file:
                 if major not in self._majors:
                     print(f"Student {cwid} '{name}' has unknown major '{major}'")
                 else:
                     self._students[cwid] = Student(cwid, name, self._majors[major])
-        except ValueError as v:
-            print(v)
 
     def _get_instructors_details(self, path: str):
         """ This method reads the instructor file and reads the file by line by line ands stores info in Gen"""
         try:
-            instructor_file: Iterator[Tuple[str]] = file_reader(path, 3, sep='|', header=True)
-            for cwid, name, dept in instructor_file:
-                self._instructors[cwid] = Instructor(cwid, name, dept)
-        except ValueError as v:
-            print(v)
+
 
     def _get_grades_details(self, path: str):
         """ This method reads the grades file and reads the file by line by line ands stores info in Gen"""
         try:
-            grades_file = file_reader(path, 4, sep='|', header=True)
+
             for student_cwid, course, grade, instructor_cwid in grades_file:
                 if student_cwid in self._students:
                     self._students[student_cwid].add_course(course, grade)
@@ -177,8 +169,7 @@ class University:
                     self._instructors[instructor_cwid].add_student(course)
                 else:
                     print(f"Grade for unknown instructor {instructor_cwid}")
-        except ValueError as v:
-            print(v)
+
 
     def print_student_prettytable(self):
         """ Pretty table for the students """
@@ -194,10 +185,12 @@ class University:
         """ Pretty table for the instructors """
         prettytable: PrettyTable = PrettyTable(field_names=Instructor.header2)
 
+
         for instructor in self._instructors.values():
             for row in instructor.ptable_row():
                 prettytable.add_row(row)
         print(prettytable)
+
 
     def print_majors_prettytable(self):
         """ Pretty table for majors """
@@ -206,6 +199,7 @@ class University:
         for major in self._majors.values():
             prettytable.add_row(major.ptable_row())
         print(prettytable)
+
 
 
 def main():
