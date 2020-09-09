@@ -1,12 +1,10 @@
-"""
-Created on Sunday April 12 16:53:34 2020
+
 
 @author: nkalyan🤠
         Implementing student repository database by using python methods and modules. 
 """
 
-import os
-import sqlite3
+
 from collections import defaultdict
 from prettytable import PrettyTable
 from typing import Dict, Set, List, Iterator, Tuple, DefaultDict
@@ -16,7 +14,7 @@ from HW08_nikhil_kalyan import file_reader
 class Student:
     """ Student class conatians all the info related to students Add course, get GPA etcc.,, """
     header = ["CWID", "Name", "Major", "Completed Courses", "Remaining Required", "Remaining Electives",
-              "GPA"]
+
 
     def __init__(self, cwid, name, major):
         """ A constructor Initialize student table details """
@@ -43,8 +41,7 @@ class Student:
     def ptable_row(self):
         """ Returning a student prettytable to prettytable method"""
         major, passed_courses, rem_required, rem_electives = self._major.courses_left(self._courses)
-        return [self._cwid, self._name, major, sorted(passed_courses), sorted(rem_required), sorted(rem_electives),
-                self.gpa()]
+
 
 
 class Instructor:
@@ -132,9 +129,6 @@ class University:
                 print("--------Majors Table--------")
                 self.print_majors_prettytable()
 
-                print("------Student Grade Summary table-----")
-                self.print_grades_prettytable()
-
     def _get_majors_details(self, path):
         """This method reads the major file and store the info using headers"""
         try:
@@ -149,28 +143,22 @@ class University:
     def _get_students_details(self, path):
         """ This method reads the students file and reads the file by line by line ands stores info in Gen """
         try:
-            student_file: Iterator[Tuple[str]] = file_reader(path, 3, sep='\t', header=True)
+
             for cwid, name, major in student_file:
                 if major not in self._majors:
                     print(f"Student {cwid} '{name}' has unknown major '{major}'")
                 else:
                     self._students[cwid] = Student(cwid, name, self._majors[major])
-        except ValueError as e:
-            print(e)
 
     def _get_instructors_details(self, path: str):
         """ This method reads the instructor file and reads the file by line by line ands stores info in Gen"""
         try:
-            instructor_file: Iterator[Tuple[str]] = file_reader(path, 3, sep='\t', header=True)
-            for cwid, name, dept in instructor_file:
-                self._instructors[cwid] = Instructor(cwid, name, dept)
-        except ValueError as e:
-            print(e)
+
 
     def _get_grades_details(self, path: str):
         """ This method reads the grades file and reads the file by line by line ands stores info in Gen"""
         try:
-            grades_file = file_reader(path, 4, sep='\t', header=True)
+
             for student_cwid, course, grade, instructor_cwid in grades_file:
                 if student_cwid in self._students:
                     self._students[student_cwid].add_course(course, grade)
@@ -181,26 +169,7 @@ class University:
                     self._instructors[instructor_cwid].add_student(course)
                 else:
                     print(f"Grade for unknown instructor {instructor_cwid}")
-        except ValueError as e:
-            print(e)
 
-    def instructor_summary_database(self):
-        """ Instructor summary table from database """
-        db: sqlite3.Connection = sqlite3.connect("/Users/nikhilkalyan/810_startup.db")
-        sql_query: str = "SELECT i.CWID, i.Name, i.Dept, g.Courses, COUNT(*) " \
-                         "FROM Grades g JOIN Instructor i on InstructorCWID = CWID " \
-                         "GROUP BY i.CWID, g.Courses ORDER BY i.CWID DESC, g.Courses DESC"
-        for cwid, name, department, course, count in db.execute(sql_query):
-            yield [cwid, name, department, course, count]
-
-    def student_summary_database(self):
-        """ A student summary table from database """
-        db: sqlite3.Connection = sqlite3.connect("/Users/nikhilkalyan/810_startup.db")
-        sql_query: str = "SELECT s.Name, s.CWID, g.Courses, g.Grade, i.Name AS 'Instructor' " \
-                         "FROM Grades g  JOIN students s  ON g.StudentCWID = s.CWID " \
-                         "JOIN Instructor i ON g.InstructorCWID = i.CWID ORDER BY s.Name"
-        for name, cwid, course, grade, instructor in db.execute(sql_query):
-            yield [name, cwid, course, grade, instructor]
 
     def print_student_prettytable(self):
         """ Pretty table for the students """
@@ -216,16 +185,12 @@ class University:
         """ Pretty table for the instructors """
         prettytable: PrettyTable = PrettyTable(field_names=Instructor.header2)
 
-        for row in self.instructor_summary_database():
-            prettytable.add_row(row)
-        print(prettytable)
 
-        '''
         for instructor in self._instructors.values():
             for row in instructor.ptable_row():
                 prettytable.add_row(row)
         print(prettytable)
-        '''
+
 
     def print_majors_prettytable(self):
         """ Pretty table for majors """
@@ -235,13 +200,6 @@ class University:
             prettytable.add_row(major.ptable_row())
         print(prettytable)
 
-    def print_grades_prettytable(self):
-        """PrettyTable for grade files"""
-        prettytable: PrettyTable = PrettyTable(field_names=["Name", "CWID", "Course", "Grade", "Instructor"])
-
-        for each_row in self.student_summary_database():
-            prettytable.add_row(each_row)
-        print(prettytable)
 
 
 def main():
